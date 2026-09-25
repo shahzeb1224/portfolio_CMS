@@ -1,0 +1,242 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   Design tokens. Dark-first: defaults live on :root, the .light
+   class overrides them. Values are RGB channels so Tailwind's
+   opacity modifiers keep working (e.g. bg-surface/60).
+   --accent* is overridden at runtime by the ThemeProvider so the
+   accent color is editable from Admin → Settings → Appearance.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --bg: 8 9 11; /* #08090B */
+  --bg-elevated: 13 15 18; /* #0D0F12 */
+  --surface: 17 19 24; /* #111318 */
+  --surface-2: 23 26 32; /* #171A20 */
+  --border: 39 42 49; /* #272A31 */
+  --border-strong: 55 59 68;
+  --text: 245 245 245; /* #F5F5F5 */
+  --text-secondary: 161 161 170; /* #A1A1AA */
+  --text-faint: 113 113 122;
+
+  --accent: 139 92 246; /* #8B5CF6 violet */
+  --accent-hover: 124 58 237; /* #7C3AED */
+  --accent-soft: 45 33 74;
+  --accent-foreground: 255 255 255;
+
+  --success: 52 211 153; /* emerald-400 */
+  --warning: 251 191 36; /* amber-400 */
+  --danger: 248 113 113; /* red-400 */
+
+  color-scheme: dark;
+}
+
+.light {
+  --bg: 250 250 251;
+  --bg-elevated: 255 255 255;
+  --surface: 255 255 255;
+  --surface-2: 245 245 247;
+  --border: 228 228 231;
+  --border-strong: 212 212 216;
+  --text: 24 24 27;
+  --text-secondary: 82 82 91;
+  --text-faint: 113 113 122;
+
+  --accent-soft: 237 233 254;
+  --accent-foreground: 255 255 255;
+
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    border-color: rgb(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.28);
+    color: rgb(var(--text));
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-foreground;
+    text-wrap: balance;
+  }
+
+  /* Focus-visible ring for keyboard users only */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--bg)), 0 0 0 4px rgb(var(--accent) / 0.7);
+    border-radius: 6px;
+  }
+
+  /* Custom scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--border-strong)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-strong));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--text-faint));
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  /* Subtle dotted/grid backdrop used behind hero + section bands */
+  .bg-grid {
+    background-image: radial-gradient(rgb(var(--border) / 0.6) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .bg-radial-accent {
+    background: radial-gradient(
+      60% 60% at 50% 0%,
+      rgb(var(--accent) / 0.12) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Thin divider line */
+  .hairline {
+    @apply border-t border-border;
+  }
+
+  /* Card surface */
+  .card {
+    @apply rounded-2xl border border-border bg-surface;
+  }
+
+  /* Skeleton shimmer block */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-surface-2;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--border) / 0.6),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--text)) 0%,
+      rgb(var(--text-secondary)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .accent-gradient-text {
+    background: linear-gradient(
+      120deg,
+      rgb(var(--accent)) 0%,
+      rgb(var(--accent-hover)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ── Markdown prose (blog + case studies) ─────────────────────── */
+.prose-portfolio {
+  @apply text-[15px] leading-7 text-muted;
+  max-width: 68ch;
+}
+.prose-portfolio > * + * {
+  margin-top: 1.15em;
+}
+.prose-portfolio h2 {
+  @apply mt-10 mb-3 text-2xl font-semibold text-foreground;
+}
+.prose-portfolio h3 {
+  @apply mt-8 mb-2 text-xl font-semibold text-foreground;
+}
+.prose-portfolio p {
+  @apply text-muted;
+}
+.prose-portfolio a {
+  @apply text-accent underline-offset-4 hover:underline;
+}
+.prose-portfolio strong {
+  @apply font-semibold text-foreground;
+}
+.prose-portfolio ul {
+  @apply list-disc space-y-1.5 pl-5 marker:text-accent;
+}
+.prose-portfolio ol {
+  @apply list-decimal space-y-1.5 pl-5 marker:text-muted;
+}
+.prose-portfolio blockquote {
+  @apply border-l-2 border-accent/60 pl-4 italic text-muted;
+}
+.prose-portfolio code {
+  @apply rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
+}
+.prose-portfolio pre {
+  @apply overflow-x-auto rounded-xl border border-border bg-background-elevated p-4 text-sm;
+}
+.prose-portfolio pre code {
+  @apply bg-transparent p-0 text-muted;
+}
+.prose-portfolio img {
+  @apply rounded-xl border border-border;
+}
+.prose-portfolio hr {
+  @apply my-8 border-border;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
